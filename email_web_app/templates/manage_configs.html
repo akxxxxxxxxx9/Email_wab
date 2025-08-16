@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}管理配置{% endblock %}
+{% block content %}
+    <h2>管理配置</h2>
+    
+    <h3>發件郵箱服務器</h3>
+    <table>
+        <thead>
+            <tr><th>用戶名</th><th>主機</th><th>端口</th><th>操作</th></tr>
+        </thead>
+        <tbody>
+            {% if config.smtp_servers %}
+                {% for server in config.smtp_servers %}
+                <tr>
+                    <td>{{ server.username }}</td>
+                    <td>{{ server.host }}</td>
+                    <td>{{ server.port }}</td>
+                    <td>
+                        <form action="{{ url_for('delete_server') }}" method="post" style="display: inline;">
+                            <input type="hidden" name="username" value="{{ server.username }}">
+                            <button type="submit" class="button-danger">刪除</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            {% endif %}
+        </tbody>
+    </table>
+    <details>
+        <summary><strong>添加新服務器</strong></summary>
+        <form action="{{ url_for('add_server') }}" method="post">
+            <input type="text" name="host" placeholder="主機 (e.g., smtp.example.com)" required>
+            <input type="text" name="port" placeholder="端口 (e.g., 587)" value="587" required>
+            <input type="email" name="username" placeholder="郵箱地址" required>
+            <input type="password" name="password" placeholder="密碼" required>
+            <button type="submit">添加服務器</button>
+        </form>
+    </details>
+
+    <h3 style="margin-top: 40px;">聯絡人列表</h3>
+    <table>
+        <thead>
+            <tr><th>姓名</th><th>郵箱地址</th><th>操作</th></tr>
+        </thead>
+        <tbody>
+            {% if config.contacts %}
+                {% for name, email in config.contacts.items() %}
+                <tr>
+                    <td>{{ name }}</td>
+                    <td>{{ email }}</td>
+                    <td>
+                        <form action="{{ url_for('delete_contact') }}" method="post" style="display: inline;">
+                            <input type="hidden" name="name" value="{{ name }}">
+                            <button type="submit" class="button-danger">刪除</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            {% endif %}
+        </tbody>
+    </table>
+    <details>
+        <summary><strong>添加新聯絡人</strong></summary>
+        <form action="{{ url_for('add_contact') }}" method="post">
+            <input type="text" name="name" placeholder="姓名" required>
+            <input type="email" name="email" placeholder="郵箱地址" required>
+            <button type="submit">添加聯絡人</button>
+        </form>
+    </details>
+{% endblock %}

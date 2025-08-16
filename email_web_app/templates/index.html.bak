@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block title %}主頁{% endblock %}
+{% block content %}
+    <h1>歡迎使用 Web 郵件客戶端</h1>
+    <p>請使用上方導航欄選擇您要執行的操作。</p>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}閱讀郵件: {{ email.subject }}{% endblock %}
+{% block content %}
+    <h2>{{ email.subject }}</h2>
+    <div class="email-headers">
+        <p><strong>發件人:</strong> {{ email.from }}</p>
+        <p><strong>收件人:</strong> {{ email.to }}</p>
+        <p><strong>日期:</strong> {{ email.date }}</p>
+    </div>
+    <hr>
+    <div class="email-body" style="border: 1px solid #eee; padding: 15px; background: #fdfdfd;">
+        {# 使用 |safe 過濾器來渲染已清理過的HTML #}
+        {{ email.body|safe }}
+    </div>
+    <a href="{{ url_for('fetch_form') }}"><button style="margin-top: 20px;">返回</button></a>
+{% endblock %}

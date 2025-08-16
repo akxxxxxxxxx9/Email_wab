@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}發送郵件{% endblock %}
+{% block content %}
+    <h2>撰寫新郵件</h2>
+    <form action="{{ url_for('send_form') }}" method="post" enctype="multipart/form-data" id="email-form">
+        <label for="sender">...</label>
+        <select name="sender" id="sender">...</select>
+        <label for="to_addr">...</label>
+        <div>...</div>
+        <label for="subject">...</label>
+        <input type="text" id="subject" name="subject" required>
+        <label for="nickname">...</label>
+        <input type="text" id="nickname" name="nickname">
+
+        <label for="body_format">正文格式:</label>
+        <select name="body_format" id="body_format">
+            <option value="plain">純文本</option>
+            <option value="html" selected>HTML</option> <option value="markdown">Markdown</option>
+        </select>
+
+        <label for="body">正文:</label>
+        <textarea id="body" name="body" rows="15" required></textarea>
+
+        <label for="attachments">附件 (可多選):</label>
+        <input type="file" id="attachments" name="attachments" multiple>
+
+        <button type="submit">發送郵件</button>
+    </form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let currentEditor = null;
+const bodyTextarea = document.getElementById('body');
+const formatSelect = document.getElementById('body_format');
+
+function setupEditor() {
+    // 銷毀舊的編輯器實例
+    if (currentEditor) {
+        if (currentEditor.summernote) {
+            $('#body').summernote('destroy');
+        } else if (currentEditor.toTextArea) {
+            currentEditor.toTextArea();
+        }
+        currentEditor = null;
+    }
+
+    // 根據選擇初始化新的編輯器
+    const format = formatSelect.value;
+    if (format === 'html') {
+        $('#body').summernote({
+            height: 300,
+            toolbar: [
+                ['style', ['style']],
+                ['font', ['bold', 'italic', 'underline', 'clear']],
+                ['color', ['color']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['table', ['table']],
+                ['insert', ['link', 'picture', 'video']],
+                ['view', ['fullscreen', 'codeview', 'help']]
+            ]
+        });
+        currentEditor = $('#body').data('summernote');
+    } else if (format === 'markdown') {
+        currentEditor = new EasyMDE({
+            element: bodyTextarea,
+            spellChecker: false,
+        });
+    }
+}
+
+// 監聽格式變化事件
+formatSelect.addEventListener('change', setupEditor);
+
+// 頁面加載時初始化默認編輯器
+document.addEventListener('DOMContentLoaded', setupEditor);
+
+// 在表單提交前，確保textarea內容同步
+document.getElementById('email-form').addEventListener('submit', function() {
+    if ($('#body').summernote) {
+        $('#body').val($('#body').summernote('code'));
+    }
+});
+</script>
+{% endblock %}

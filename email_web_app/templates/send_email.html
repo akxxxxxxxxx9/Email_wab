@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block title %}發送郵件{% endblock %}
+{% block content %}
+    <h2>撰寫新郵件</h2>
+    <form action="{{ url_for('send_form') }}" method="post" enctype="multipart/form-data" id="email-form">
+        <label for="sender">選擇發件賬號:</label>
+        <select name="sender" id="sender" required>
+            {% if config.smtp_servers %}
+                {% for server in config.smtp_servers %}
+                <option value="{{ server.username }}">{{ server.username }}</option>
+                {% endfor %}
+            {% endif %}
+        </select>
+
+        <label for="to_addr">收件人 (可從下拉選單多選，或手動輸入，逗號隔開):</label>
+        <div style="display: flex; gap: 10px;">
+            <input type="text" id="to_addr" name="to_addr" required style="flex-grow: 1;">
+            <select id="contact_select" style="width: 200px;">
+                <option value="">-- 從聯絡人添加 --</option>
+                {% if config.contacts %}
+                    {% for name, email in config.contacts.items() %}
+                    <option value="{{ email }}">{{ name }}</option>
+                    {% endfor %}
+                {% endif %}
+            </select>
+        </div>
+
+        <label for="subject">主題:</label>
+        <input type="text" id="subject" name="subject" required>
+        
+        <label for="nickname">發件人昵稱 (可選):</label>
+        <input type="text" id="nickname" name="nickname">
+
+        <label for="body_format">正文格式:</label>
+        <select name="body_format" id="body_format">
+            <option value="html" selected>HTML</option>
+            <option value="markdown">Markdown</option>
+            <option value="plain">純文本</option>
+        </select>
+
+        <label for="body">正文:</label>
+        <textarea id="body" name="body" rows="15" required></textarea>
+
+        <label for="attachments">附件 (可多選):</label>
+        <input type="file" id="attachments" name="attachments" multiple>
+
+        <button type="submit">發送郵件</button>
+    </form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.getElementById('contact_select').addEventListener('change', function() {
+        if (this.value) {
+            const toInput = document.getElementById('to_addr');
+            if (toInput.value && !toInput.value.endsWith(',') && !toInput.value.endsWith(', ')) {
+                toInput.value += ', ';
+            }
+            toInput.value += this.value;
+            this.selectedIndex = 0;
+        }
+    });
+
+    let currentEditor = null;
+    const bodyTextarea = document.getElementById('body');
+    const formatSelect = document.getElementById('body_format');
+
+    function setupEditor() {
+        if (currentEditor) {
+            if (currentEditor.summernote) {
+                $('#body').summernote('destroy');
+            } else if (currentEditor.toTextArea) {
+                currentEditor.toTextArea();
+            }
+            currentEditor = null;
+        }
+
+        const format = formatSelect.value;
+        if (format === 'html') {
+            $('#body').summernote({
+                height: 300,
+                toolbar: [
+                    ['style', ['style']],
+                    ['font', ['bold', 'italic', 'underline', 'clear']],
+                    ['color', ['color']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['table', ['table']],
+                    ['insert', ['link', 'picture', 'video']],
+                    ['view', ['fullscreen', 'codeview', 'help']]
+                ]
+            });
+            currentEditor = $('#body').data('summernote');
+        } else if (format === 'markdown') {
+            currentEditor = new EasyMDE({
+                element: bodyTextarea,
+                spellChecker: false,
+            });
+        }
+    }
+
+    formatSelect.addEventListener('change', setupEditor);
+    document.addEventListener('DOMContentLoaded', setupEditor);
+
+    document.getElementById('email-form').addEventListener('submit', function() {
+        if (formatSelect.value === 'html' && $('#body').summernote) {
+            $('#body').val($('#body').summernote('code'));
+        } else if (formatSelect.value === 'markdown' && currentEditor) {
+            document.getElementById('body').value = currentEditor.value();
+        }
+    });
+</script>
+{% endblock %}

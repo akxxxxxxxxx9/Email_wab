@@ -1,0 +1,39 @@
+{
+  "smtp_servers": [
+    {
+      "host": "server7.webhostmost.com",
+      "port": 587,
+      "username": "aki@nana.aki.edu.kg",
+      "password": "@Momobako2472"
+    },
+    {
+      "host": "server7.webhostmost.com",
+      "port": 587,
+      "username": "momo@nana.aki.edu.kg",
+      "password": "@Momobako2472"
+    },
+    {
+      "host": "s15.serv00.com",
+      "port": 587,
+      "username": "aki@aki.edu.kg",
+      "password": "@Momobako2472"
+    },
+    {
+      "host": "s15.serv00.com",
+      "port": 587,
+      "username": "momobako@aki.edu.kg",
+      "password": "@Momobako2472"
+    },
+    {
+      "host": "server8.webhostmost.com",
+      "port": 587,
+      "username": "elnbqhbs@wed.996399.xyz",
+      "password": "m;!Y12u2Ye1DSl"
+    }
+  ],
+  "contacts": {
+    "主账户": "ao1160301aila@gmail.com",
+    "Yahoo常用": "momobakoda@yahoo.com",
+    "內部測試賬號": "momonechinoi@proton.me"
+  }
+}

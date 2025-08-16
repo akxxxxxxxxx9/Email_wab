@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}獲取郵件{% endblock %}
+{% block content %}
+    <h2>獲取郵件</h2>
+    <form action="{{ url_for('fetch_form') }}" method="post">
+        <label for="account">選擇要檢查的郵箱賬號:</label>
+        <select name="account" id="account" required<tbody>
+    {% for email in emails %}
+    <tr>
+        <td>{{ email.from }}</td>
+        <td><a href="{{ url_for('view_email', account_username=account_checked, email_uid=email.uid) }}">{{ email.subject }}</a></td>
+        <td>{{ email.date }}</td>
+    </tr>
+    {% endfor %}
+</tbody>
+
+            {% for server in config.smtp_servers %}
+            <option value="{{ server.username }}">{{ server.username }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">開始獲取</button>
+    </form>
+
+    {% if emails %}
+    <h3>在 "{{ account_checked }}" 中找到 {{ emails|length }} 封未讀郵件</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>發件人</th>
+                <th>主題</th>
+                <th>日期</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for email in emails %}
+            <tr>
+                <td>{{ email.from }}</td>
+                <td>{{ email.subject }}</td>
+                <td>{{ email.date }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+{% endblock %}
